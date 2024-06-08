@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blog</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'blog/style.css' %}">
+    <script>
+        function confirmDelete(postId) {
+            if (confirm('Are you sure you want to delete this post?')) {
+                fetch(`/post/${postId}/delete/`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message === 'Post deleted') {
+                            window.location.reload();
+                        }
+                    });
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Blog Posts</h1>
+        <form method="GET" action="{% url 'post_list' %}" class="search-form">
+            <input type="text" name="q" placeholder="Search posts..." value="{{ query }}" class="search-input">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <a href="{% url 'create_post_form' %}" class="btn btn-primary new-post-btn">+ Create New Post</a>
+        <ul class="post-list">
+            {% for post in posts %}
+            <li class="post-item">
+                <a href="{% url 'post_detail' post.id %}" class="post-title">{{ post.title }}</a>
+                <p class="post-date">{{ post.created_at }}</p>
+                <a href="{% url 'update_post_form_page' post.id %}" class="btn btn-secondary">Edit</a>
+                <button class="btn btn-danger" onclick="confirmDelete({{ post.id }})">Delete</button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
